@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from client_init import get_bq_client
+from .client_init import get_bq_client
 from google.cloud import bigquery
 import os
 
@@ -8,17 +8,20 @@ load_dotenv()
 project_id = os.getenv('GOOGLE_PROJECT_ID')
 database_id = os.getenv('DATABASE_ID')
 
-def get_actions(user_id):
+def fetch_actions(user_id):
     # Load client
     client_bq = get_bq_client()
-    query = """
+    query = f"""
             SELECT
             action_id,
             action_name,
             action_type,
             action_description,
-            action_spend,
-            action_timeline
+            estimated_spend,
+            plan_id,
+            timeline_start,
+            timeline_end, 
+            status
             FROM `{project_id}.{database_id}.action`
             WHERE user_id = @user_id
         """
@@ -31,5 +34,10 @@ def get_actions(user_id):
 
     # Query database
     actions = client_bq.query(query=query, job_config=query_config).result()
+
+    # Get dict output
+    out = [dict(row) for row in actions]
+    return out
+
 
     
