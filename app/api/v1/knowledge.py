@@ -4,9 +4,9 @@ from fastapi import APIRouter, Header, File, UploadFile
 router = APIRouter()
 
 @router.get("/document")
-def getDocument(user_id: str = Header()):
+def get_document(user_id: str = Header()):
     return fetch_documents(user_id)
 
 @router.post("/upload")
-def uploadFile(user_id: str = Header(), file: UploadFile = File()):
+def upload_file(user_id: str = Header(), file: UploadFile = File()):
     return upload_document(user_id, file)
