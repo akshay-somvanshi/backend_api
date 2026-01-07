@@ -1,12 +1,15 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from .api.v1.router import router
+from app.api.v1.dashboard import router as dashboard_router
+from app.api.v1.knowledge import router as knowledge_router
 
 # Initialise app
 app = FastAPI(title='Dash API', version='v1')
 
-# Include router
-app.include_router(router=router)
+# Include dashboard router
+app.include_router(router=dashboard_router)
+# Include knowledge router
+app.include_router(router=knowledge_router)
 
 @app.get("/health")
 async def health():
