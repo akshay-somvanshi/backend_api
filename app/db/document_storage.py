@@ -1,8 +1,12 @@
 from .client_init import get_storage_bucket
-import os 
+from datetime import timedelta
 import uuid
+from google import auth
 from dotenv import load_dotenv
-from fastapi import HTTPException, UploadFile, File
+from fastapi import HTTPException, File
+
+credentials, project = auth.default()
+credentials.refresh(auth.transport.requests.Request())
 
 def fetch_documents(user_id: str):
     # Get bucket
@@ -25,9 +29,29 @@ def fetch_documents(user_id: str):
 
     return documents
 
-def generate_signed_url(document_path, action):
+def generate_signed_url(document_path, action, user_id):
     # Get bucket
     bucket = get_storage_bucket()
+
+    # Check the path can be accessed by user
+    assert document_path.startswith(f"users/{user_id}/"), "Access denied"
+    
+    blob = bucket.blob(document_path)
+
+    response_disposition = None
+    if action == "download":
+        response_disposition = f'attachment; filename="{blob.name.split("/")[-1]}"'
+
+    url = blob.generate_signed_url(
+        version='v4',
+        expiration=timedelta(minutes=5),
+        method='GET', 
+        service_account_email="441601669115-compute@developer.gserviceaccount.com",
+        access_token=credentials.token,
+        response_disposition=response_disposition
+    )
+    
+    return url
 
 def upload_document(user_id, file):
     # Get bucket
