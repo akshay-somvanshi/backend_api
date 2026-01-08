@@ -12,5 +12,5 @@ def upload_file(user_id: str = Header(), file: UploadFile = File()):
     return upload_document(user_id, file)
 
 @router.get("/document/signed_url")
-def get_document_url(document_path: str, action: str):
-    return generate_signed_url(document_path, action)
+def get_document_url(document_path: str, action: str, user_id: str):
+    return generate_signed_url(document_path, action, user_id)
