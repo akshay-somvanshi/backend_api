@@ -18,6 +18,8 @@ def fetch_actions(user_id):
             action_type,
             action_description,
             estimated_spend,
+            estimated_co2_reduced,
+            estimated_revenue_unlocked,
             plan_id,
             timeline_start,
             timeline_end, 
