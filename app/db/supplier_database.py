@@ -7,9 +7,10 @@ load_dotenv()
 project_id = os.getenv('GOOGLE_PROJECT_ID')
 database_id = os.getenv('DATABASE_ID')
 
-def fetch_supplier(user_id):
-    client = get_bq_client()
+# Connect to client
+client = get_bq_client()
 
+def fetch_supplier(user_id):
     query= f"""
         SELECT 
         supplier_id,

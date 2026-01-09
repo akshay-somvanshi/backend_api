@@ -1,10 +1,10 @@
 from .client_init import get_firestore
 from datetime import datetime
 
-def getSuggestions(user_id, chip_type):
-    # Connect to firestore
-    firestore = get_firestore()
+# Connect to firestore
+firestore = get_firestore()
 
+def getSuggestions(user_id, chip_type):
     # Get now timestamp
     now = datetime.utcnow()
 

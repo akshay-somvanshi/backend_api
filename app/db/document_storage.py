@@ -8,10 +8,10 @@ from fastapi import HTTPException, File
 credentials, project = auth.default()
 credentials.refresh(auth.transport.requests.Request())
 
-def fetch_documents(user_id: str):
-    # Get bucket
-    bucket = get_storage_bucket()
+# Get bucket
+bucket = get_storage_bucket()
 
+def fetch_documents(user_id: str):
     # All the documents for this user will be under this prefix
     prefix = f"users/{user_id}/uploads/"
     blobs = bucket.list_blobs(prefix=prefix)
@@ -30,9 +30,6 @@ def fetch_documents(user_id: str):
     return documents
 
 def generate_signed_url(document_path, action, user_id):
-    # Get bucket
-    bucket = get_storage_bucket()
-
     # Check the path can be accessed by user
     assert document_path.startswith(f"users/{user_id}/"), "Access denied"
     
@@ -54,9 +51,6 @@ def generate_signed_url(document_path, action, user_id):
     return url
 
 def upload_document(user_id, file):
-    # Get bucket
-    bucket = get_storage_bucket()
-
     # Create a unique path
     file_name = file.filename.split(".")[0]
     file_ext = file.filename.split(".")[-1]
