@@ -74,8 +74,8 @@ def delete_action(user_id, action_id):
         # Add job config for parameters
         query_config = bigquery.QueryJobConfig(
             query_parameters=[
-                bigquery.ScalarQueryParameters("user_id", "STRING", user_id),
-                bigquery.ScalarQueryParameters("action_id", "STRING", action_id)
+                bigquery.ScalarQueryParameter("user_id", "STRING", user_id),
+                bigquery.ScalarQueryParameter("action_id", "STRING", action_id)
             ]
         )
 
@@ -99,11 +99,11 @@ def update_action_service(user_id, action_id, co2_red, spend, rev_unlocked):
         # Job config for parameters
         query_config = bigquery.QueryJobConfig(
             query_parameters=[
-                bigquery.ScalarQueryParameters("user_id", "STRING", user_id),
-                bigquery.ScalarQueryParameters("action_id", "STRING", action_id),
-                bigquery.ScalarQueryParameters("co2_red", "FLOAT", co2_red),
-                bigquery.ScalarQueryParameters("spend", "FLOAT", spend),
-                bigquery.ScalarQueryParameters("rev_unlocked", "FLOAT", rev_unlocked)
+                bigquery.ScalarQueryParameter("user_id", "STRING", user_id),
+                bigquery.ScalarQueryParameter("action_id", "STRING", action_id),
+                bigquery.ScalarQueryParameter("co2_red", "FLOAT", co2_red),
+                bigquery.ScalarQueryParameter("spend", "FLOAT", spend),
+                bigquery.ScalarQueryParameter("rev_unlocked", "FLOAT", rev_unlocked)
             ]
         )
 
