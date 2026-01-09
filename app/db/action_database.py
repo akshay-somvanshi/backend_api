@@ -88,7 +88,7 @@ def delete_action(user_id, action_id):
     except Exception as e:
         raise DatabaseError("Failed to delete action", e)
     
-def update_action(user_id, action_id, co2_red, spend, rev_unlocked):
+def update_action_service(user_id, action_id, co2_red, spend, rev_unlocked):
     try:
         query = f"""
                 UPDATE `{project_id}.{database_id}.action`

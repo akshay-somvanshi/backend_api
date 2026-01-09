@@ -1,8 +1,8 @@
 from ...db.suggestion_database import getSuggestions
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Header, Query
 
 router = APIRouter()
 
 @router.get("/suggestions")
-def get_suggestions(user_id: str = Header(), chip_type: str = Header()):
+def get_suggestions(user_id: str = Header(), chip_type: str = Query(...)):
     return getSuggestions(user_id, chip_type)

@@ -59,7 +59,7 @@ def generate_signed_url(document_path, action, user_id):
     except Exception as e:
         raise StorageError("Failed to fetch signed url from Cloud storage", e)
 
-def upload_document(user_id, file):
+def up_document(user_id, file):
     # Create a unique path
     file_name = file.filename.split(".")[0]
     file_ext = file.filename.split(".")[-1]
