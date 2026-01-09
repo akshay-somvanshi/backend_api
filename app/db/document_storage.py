@@ -1,4 +1,5 @@
 from .client_init import get_storage_bucket
+from ..core.exceptions import StorageError
 from datetime import timedelta
 import uuid
 from google import auth
@@ -12,43 +13,51 @@ credentials.refresh(auth.transport.requests.Request())
 bucket = get_storage_bucket()
 
 def fetch_documents(user_id: str):
-    # All the documents for this user will be under this prefix
-    prefix = f"users/{user_id}/uploads/"
-    blobs = bucket.list_blobs(prefix=prefix)
+    try:
+        # All the documents for this user will be under this prefix
+        prefix = f"users/{user_id}/uploads/"
+        blobs = bucket.list_blobs(prefix=prefix)
 
-    documents = []
+        documents = []
 
-    for blob in blobs:
-        documents.append({
-            "file_name": blob.name.split("/")[-1],
-            "gcs_path": blob.name,
-            "size_bytes": blob.size,
-            "content_type": blob.content_type,
-            "updated": blob.updated.isoformat()
-        })
+        for blob in blobs:
+            documents.append({
+                "file_name": blob.name.split("/")[-1],
+                "gcs_path": blob.name,
+                "size_bytes": blob.size,
+                "content_type": blob.content_type,
+                "updated": blob.updated.isoformat()
+            })
 
-    return documents
+        return documents
+    
+    except Exception as e:
+        raise StorageError("Failed to fetch document from Cloud storage", e)
 
 def generate_signed_url(document_path, action, user_id):
-    # Check the path can be accessed by user
-    assert document_path.startswith(f"users/{user_id}/"), "Access denied"
-    
-    blob = bucket.blob(document_path)
+    try:
+        # Check the path can be accessed by user
+        assert document_path.startswith(f"users/{user_id}/"), "Access denied"
+        
+        blob = bucket.blob(document_path)
 
-    response_disposition = None
-    if action == "download":
-        response_disposition = f'attachment; filename="{blob.name.split("/")[-1]}"'
+        response_disposition = None
+        if action == "download":
+            response_disposition = f'attachment; filename="{blob.name.split("/")[-1]}"'
 
-    url = blob.generate_signed_url(
-        version='v4',
-        expiration=timedelta(minutes=5),
-        method='GET', 
-        service_account_email="441601669115-compute@developer.gserviceaccount.com",
-        access_token=credentials.token,
-        response_disposition=response_disposition
-    )
+        url = blob.generate_signed_url(
+            version='v4',
+            expiration=timedelta(minutes=5),
+            method='GET', 
+            service_account_email="441601669115-compute@developer.gserviceaccount.com",
+            access_token=credentials.token,
+            response_disposition=response_disposition
+        )
+        
+        return url
     
-    return url
+    except Exception as e:
+        raise StorageError("Failed to fetch signed url from Cloud storage", e)
 
 def upload_document(user_id, file):
     # Create a unique path
@@ -73,5 +82,5 @@ def upload_document(user_id, file):
         }
     
     except Exception as e:
-        return HTTPException(status_code=500, detail=f"{type(e).__name__}: {e}")
+        return StorageError("Failed to upload document to Cloud storage", e)
         
