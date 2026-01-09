@@ -7,7 +7,7 @@ router = APIRouter()
 def get_document(user_id: str = Header()):
     return fetch_documents(user_id)
 
-@router.post("/upload")
+@router.post("/document")
 def upload_file(user_id: str = Header(), file: UploadFile = File()):
     return up_document(user_id, file)
 
