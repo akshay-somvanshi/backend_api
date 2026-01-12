@@ -1,13 +1,22 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.knowledge import router as knowledge_router
 from app.api.v1.suggestions import router as suggestion_router
 from app.core.exceptions import DatabaseError, StorageError
+from fastapi.middleware.cors import CORSMiddleware
 
 # Initialise app
 app = FastAPI(title='Dash API', version='v1')
+
+# Add CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.exception_handler(DatabaseError)
 async def database_exception_handler(request: Request, err: DatabaseError):
