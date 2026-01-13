@@ -115,3 +115,51 @@ def update_action_service(user_id, action_id, co2_red, spend, rev_unlocked):
     
     except Exception as e:
         raise DatabaseError("Failed to update action", e)
+
+def get_unlocking_actions(user_id, action_id):
+    try: 
+        query= f"""
+                SELECT action_id as unlocks_action
+                FROM `{project_id}.{database_id}.action_dependency`
+                WHERE user_id = @user_id AND depends_on_action_id = @depends_on_action_id
+            """
+
+        # Job config 
+        query_config = bigquery.QueryJobConfig(
+            query_parameters=[
+                bigquery.ScalarQueryParameter("user_id", "STRING", user_id),
+                bigquery.ScalarQueryParameter("depends_on_action_id", "STRING", action_id)
+            ]
+        )
+
+        # Query database
+        actions = client_bq.query(query=query, job_config=query_config).result()
+
+        return [dict(action) for action in actions]
+    
+    except Exception as e:
+        raise DatabaseError("Failed to fetch action", e)
+    
+def get_dependent_on_actions(user_id, action_id):
+    try:
+        query = f"""
+                SELECT depends_on_action_id as dependent_action
+                FROM `{project_id}.{database_id}.action_dependency`
+                WHERE user_id = @user_id AND action_id = @action_id              
+            """
+        
+        # Job Config
+        query_config = bigquery.QueryJobConfig(
+            query_parameters=[
+                bigquery.ScalarQueryParameter("user_id", "STRING", user_id),
+                bigquery.ScalarQueryParameter("action_id", "STRING", action_id)
+            ]
+        )
+
+        # Query database
+        actions = client_bq.query(query=query, job_config=query_config).result()
+
+        return [dict(action) for action in actions]
+    
+    except Exception as e:
+        raise DatabaseError("Failed to fetch action", e)

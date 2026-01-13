@@ -45,3 +45,27 @@ def fetch_supplier(user_id) -> list[Supplier]:
     
     except Exception as e:
         raise DatabaseError("Failed to fetch supplier from BigQuery", e)
+    
+def get_supplier_targets_service(user_id, supplier_id):
+    try:
+        query = f"""
+                SELECT target_id
+                FROM `{project_id}.{database_id}.supplier_target`
+                WHERE user_id = @user_id AND supplier_id = @supplier_id 
+            """
+        
+        # Add job config 
+        query_config = bigquery.QueryJobConfig(
+            query_parameters=[
+                bigquery.ScalarQueryParameter("user_id", "STRING", user_id),
+                bigquery.ScalarQueryParameter("supplier_id", "STRING", supplier_id)
+            ]
+        )
+
+        # Query database
+        targets = client.query(query=query, job_config=query_config).result()
+
+        return [dict(target) for target in targets]
+    
+    except Exception as e:
+        raise DatabaseError("Failed to fetch targets", e)
