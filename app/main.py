@@ -25,7 +25,7 @@ async def database_exception_handler(request: Request, err: DatabaseError):
 
     return JSONResponse(
         status_code=500,
-        content={"detail": "A database error has occurred."}
+        content={"detail": str(err)}
     )
 
 @app.exception_handler(StorageError)
@@ -35,7 +35,7 @@ async def storage_exception_handler(request: Request, err: StorageError):
 
     return JSONResponse(
         status_code=500,
-        content={"detail": "A cloud storage error has occurred."}
+        content={"detail": str(err)}
     )
 
 # Include dashboard router

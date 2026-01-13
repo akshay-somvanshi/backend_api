@@ -36,8 +36,9 @@ def fetch_documents(user_id: str):
 
 def generate_signed_url(document_path, action, user_id):
     try:
-        # Check the path can be accessed by user
-        assert document_path.startswith(f"users/{user_id}/"), "Access denied"
+        # Check that the file can be accessed by user
+        if not document_path.startswith(f"users/{user_id}/"):
+            raise PermissionError("Access denied")
         
         blob = bucket.blob(document_path)
 
@@ -84,3 +85,18 @@ def up_document(user_id, file):
     except Exception as e:
         return StorageError("Failed to upload document to Cloud storage", e)
         
+def del_document(user_id, document_path):
+    try:
+        # Check that the file can be accessed by user
+        if not document_path.startswith(f"users/{user_id}/"):
+            raise PermissionError("Access denied")
+
+        blob = bucket.blob(document_path)
+        blob.delete()
+
+        return{
+            "message": "File deleted"
+        }
+
+    except Exception as e:
+        raise StorageError("Failed to delete file", e)
