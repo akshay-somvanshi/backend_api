@@ -88,13 +88,16 @@ def delete_action(user_id, action_id):
     except Exception as e:
         raise DatabaseError("Failed to delete action", e)
     
-def update_action_service(user_id, action_id, co2_red, spend, rev_unlocked):
+def update_action_service(user_id, action_id, co2_red, spend, rev_unlocked, day_start, day_end):
     try:
         query = f"""
                 UPDATE `{project_id}.{database_id}.action`
-                SET actual_co2_reduced = @co2_red, actual_spend = @spend, actual_revenue_unlocked = @rev_unlocked
+                SET actual_co2_reduced = @co2_red, actual_spend = @spend, actual_revenue_unlocked = @rev_unlocked, actual_time_taken = @days_taken
                 WHERE action_id = @action_id AND user_id = @user_id
             """
+
+        delta = day_end - day_start 
+        days_taken = delta.days
 
         # Job config for parameters
         query_config = bigquery.QueryJobConfig(
@@ -103,7 +106,8 @@ def update_action_service(user_id, action_id, co2_red, spend, rev_unlocked):
                 bigquery.ScalarQueryParameter("action_id", "STRING", action_id),
                 bigquery.ScalarQueryParameter("co2_red", "FLOAT", co2_red),
                 bigquery.ScalarQueryParameter("spend", "FLOAT", spend),
-                bigquery.ScalarQueryParameter("rev_unlocked", "FLOAT", rev_unlocked)
+                bigquery.ScalarQueryParameter("rev_unlocked", "FLOAT", rev_unlocked),
+                bigquery.ScalarQueryParameter("days_taken", "FLOAT", days_taken)
             ]
         )
 

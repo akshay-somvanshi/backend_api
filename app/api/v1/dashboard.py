@@ -3,6 +3,7 @@ from ...db.supplier_database import fetch_supplier, get_supplier_targets_service
 from ...db.target_database import fetch_target
 from fastapi import APIRouter, Header
 from pydantic import BaseModel
+from datetime import datetime
 
 router = APIRouter()
 
@@ -11,6 +12,8 @@ class actual_vals(BaseModel):
     co2_red: float
     spend: float
     rev_unlocked: float
+    day_start: datetime
+    day_end: datetime
 
 @router.get("/action")
 def get_actions(user_id: str = Header()):
@@ -22,7 +25,7 @@ def del_actions(action_id: str, user_id: str = Header()):
 
 @router.put("/action/{action_id}")
 def update_action(action_id: str, userVals: actual_vals, user_id: str = Header()):
-    return update_action_service(user_id, action_id, userVals.co2_red, userVals.spend, userVals.rev_unlocked)
+    return update_action_service(user_id, action_id, userVals.co2_red, userVals.spend, userVals.rev_unlocked, userVals.day_start, userVals.day_end)
 
 @router.get("/action/{action_id}/dependencies")
 def get_dep_action(action_id: str, user_id: str = Header()):
