@@ -15,6 +15,7 @@ class Supplier(BaseModel):
     supplier_name: str
     supplier_country: str
     supplier_type: str
+    supplier_industry: str
 
 # Connect to client
 client = get_bq_client()
@@ -26,7 +27,8 @@ def fetch_supplier(user_id) -> list[Supplier]:
             supplier_id,
             supplier_name,
             supplier_country,
-            supplier_type
+            supplier_type,
+            supplier_industry
             FROM `{project_id}.{database_id}.supplier`
             WHERE user_id = @user_id
         """
