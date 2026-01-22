@@ -51,9 +51,11 @@ def fetch_supplier(user_id) -> list[Supplier]:
 def get_supplier_targets_service(user_id, supplier_id):
     try:
         query = f"""
-                SELECT target_id
-                FROM `{project_id}.{database_id}.supplier_target`
-                WHERE user_id = @user_id AND supplier_id = @supplier_id 
+                SELECT st.target_id, t.target_type
+                FROM `{project_id}.{database_id}.supplier_target` st 
+                LEFT JOIN `{project_id}.{database_id}.targets` t 
+                ON t.target_id = st.target_id
+                WHERE st.user_id = @user_id AND st.supplier_id = @supplier_id 
             """
         
         # Add job config 
