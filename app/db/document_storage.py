@@ -1,6 +1,6 @@
 from .client_init import get_storage_bucket
 from ..core.exceptions import StorageError
-from datetime import timedelta
+from datetime import timedelta, datetime
 import uuid
 from google import auth
 from dotenv import load_dotenv
@@ -36,6 +36,11 @@ def fetch_documents(user_id: str):
 
 def generate_signed_url(document_path, action, user_id):
     try:
+        # Refresh credentials if expires
+        if not credentials.valid or (credentials.expiry and credentials.expiry < datetime.utcnow()):
+            print("Refreshing credentials...")
+            credentials.refresh(auth.transport.requests.Request())
+
         # Check that the file can be accessed by user
         if not document_path.startswith(f"users/{user_id}/"):
             raise PermissionError("Access denied")
