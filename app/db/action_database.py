@@ -169,3 +169,39 @@ def get_dependent_on_actions(user_id, action_id):
     
     except Exception as e:
         raise DatabaseError("Failed to fetch action", e)
+    
+def add_action_service(user_id, action_id, action_name, action_type, action_description, estimated_spend, estimated_co2_reduced, estimated_revenue_unlocked, plan_id, timeline_start,
+               timeline_end, status):
+    try:
+        query = f"""
+                INSERT INTO `{project_id}.{database_id}.action`
+                (action_id, action_name, action_type, action_description, estimated_spend, estimated_co2_reduced, estimated_revenue_unlocked, plan_id, timeline_start, timeline_end, status, user_id, created_at)
+                VALUES (@action_id, @action_name, @action_type, @action_description, @estimated_spend, @estimated_co2_reduced, @estimated_revenue_unlocked, @plan_id, @timeline_start, @timeline_end, @status, @user_id, @created_at)
+            """
+
+        query_config = bigquery.QueryJobConfig(
+            query_parameters=[
+                bigquery.ScalarQueryParameter("action_id", "STRING", action_id),
+                bigquery.ScalarQueryParameter("action_name", "STRING", action_name),
+                bigquery.ScalarQueryParameter("action_type", "STRING", action_type),
+                bigquery.ScalarQueryParameter("action_description","STRING", action_description),
+                bigquery.ScalarQueryParameter("estimated_spend", "FLOAT", estimated_spend),
+                bigquery.ScalarQueryParameter("estimated_co2_reduced", "FLOAT", estimated_co2_reduced),
+                bigquery.ScalarQueryParameter("estimated_revenue_unlocked", "FLOAT", estimated_revenue_unlocked),
+                bigquery.ScalarQueryParameter("plan_id", "STRING", plan_id),
+                bigquery.ScalarQueryParameter("timeline_start", "TIMESTAMP", timeline_start),
+                bigquery.ScalarQueryParameter("timeline_end", "TIMESTAMP", timeline_end),
+                bigquery.ScalarQueryParameter("status", "STRING", status),
+                bigquery.ScalarQueryParameter("user_id", "STRING", user_id),
+                bigquery.ScalarQueryParameter("created_at", "TIMESTAMP", datetime.now())
+            ]
+        )
+
+        # Query database
+        res = client_bq.query(query=query, job_config=query_config).result()
+
+        # Get dict output
+        return {"rows_changed": res.num_dml_affected_rows}
+    
+    except Exception as e:
+        raise DatabaseError("Failed to add action", e)

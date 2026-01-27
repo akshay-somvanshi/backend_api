@@ -1,4 +1,4 @@
-from ...db.action_database import fetch_actions, delete_action, update_action_service, get_unlocking_actions, get_dependent_on_actions
+from ...db.action_database import fetch_actions, delete_action, update_action_service, get_unlocking_actions, get_dependent_on_actions, add_action_service
 from ...db.supplier_database import fetch_supplier, get_supplier_targets_service
 from ...db.target_database import fetch_target
 from fastapi import APIRouter, Header
@@ -15,6 +15,19 @@ class actual_vals(BaseModel):
     day_start: datetime
     day_end: datetime
 
+class add_action(BaseModel):
+    action_id: str
+    action_name: str
+    action_type: str
+    action_description: str
+    estimated_spend: float
+    estimated_co2_reduced: float
+    estimated_revenue_unlocked: float
+    plan_id: str
+    timeline_start: datetime
+    timeline_end: datetime
+    status: str
+
 @router.get("/action")
 def get_actions(user_id: str = Header()):
     return fetch_actions(user_id)
@@ -26,6 +39,12 @@ def del_actions(action_id: str, user_id: str = Header()):
 @router.put("/action/{action_id}")
 def update_action(action_id: str, userVals: actual_vals, user_id: str = Header()):
     return update_action_service(user_id, action_id, userVals.co2_red, userVals.spend, userVals.rev_unlocked, userVals.day_start, userVals.day_end)
+
+@router.post("/action")
+def add_action(actionVals: add_action, user_id: str = Header()):
+    return add_action_service(user_id, actionVals.action_id, actionVals.action_name, actionVals.action_type, actionVals.action_description, actionVals.estimated_spend, 
+                              actionVals.estimated_co2_reduced, actionVals.estimated_revenue_unlocked, actionVals.plan_id, actionVals.timeline_start, actionVals.timeline_end,
+                              actionVals.status)
 
 @router.get("/action/{action_id}/dependencies")
 def get_dep_action(action_id: str, user_id: str = Header()):
