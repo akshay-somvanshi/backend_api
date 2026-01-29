@@ -23,6 +23,10 @@ class Action(BaseModel):
     estimated_spend: float
     estimated_co2_reduced: float
     estimated_revenue_unlocked: float
+    actual_co2_reduced: float | None
+    actual_spend: float | None
+    actual_revenue_unlocked: float | None
+    actual_time_taken: float | None
     plan_id: str 
     timeline_start: datetime
     timeline_end: datetime
@@ -39,6 +43,10 @@ def fetch_actions(user_id) -> list[Action]:
                 estimated_spend,
                 estimated_co2_reduced,
                 estimated_revenue_unlocked,
+                actual_co2_reduced,
+                actual_spend,
+                actual_revenue_unlocked,
+                actual_time_taken,
                 plan_id,
                 timeline_start,
                 timeline_end, 
