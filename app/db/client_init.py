@@ -1,4 +1,4 @@
-from google.cloud import bigquery, storage
+from google.cloud import bigquery, storage, secretmanager
 import firebase_admin
 from firebase_admin import firestore
 from dotenv import load_dotenv
@@ -20,3 +20,6 @@ def get_storage_bucket():
 
 def get_firestore():
     return firestore.client()
+
+def get_secret_manager_client():
+    return secretmanager.SecretManagerServiceClient()
