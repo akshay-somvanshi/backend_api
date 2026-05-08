@@ -12,7 +12,7 @@ credentials.refresh(auth.transport.requests.Request())
 # Get bucket
 bucket = get_storage_bucket()
 
-def fetch_documents(user_id: str):
+def fetch_uploaded_documents(user_id: str):
     try:
         # All the documents for this user will be under this prefix
         prefix = f"users/{user_id}/uploads/"
@@ -32,7 +32,29 @@ def fetch_documents(user_id: str):
         return documents
     
     except Exception as e:
-        raise StorageError("Failed to fetch document from Cloud storage", e)
+        raise StorageError("Failed to fetch user uploaded documents from Cloud storage", e)
+
+def fetch_agent_documents(user_id: str):
+    try:
+        # All the documents for this user will be under this prefix
+        prefix = f"users/{user_id}/reports/"
+        blobs = bucket.list_blobs(prefix=prefix)
+
+        documents = []
+
+        for blob in blobs:
+            documents.append({
+                "file_name": blob.name.split("/")[-1],
+                "gcs_path": blob.name,
+                "size_bytes": blob.size,
+                "content_type": blob.content_type,
+                "updated": blob.updated.isoformat()
+            })
+
+        return documents
+    
+    except Exception as e:
+        raise StorageError("Failed to fetch agent generated document from Cloud storage", e)
 
 def generate_signed_url(document_path, action, user_id):
     try:
