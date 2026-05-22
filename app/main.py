@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.knowledge import router as knowledge_router
 from app.api.v1.suggestions import router as suggestion_router
+from app.api.v1.generate_suggestions import router as generate_suggestions_router
 from app.core.exceptions import DatabaseError, StorageError
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -44,6 +45,8 @@ app.include_router(router=dashboard_router)
 app.include_router(router=knowledge_router)
 # Include suggestion router
 app.include_router(router=suggestion_router)
+# Include generate suggestions (nightly cron) router
+app.include_router(router=generate_suggestions_router)
 
 @app.get("/")
 async def home():
